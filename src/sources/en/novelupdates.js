@@ -203,6 +203,23 @@ const parseChapter = async (novelUrl, chapterUrl) => {
 
   const loadedCheerio = cheerio.load(body);
 
+  const getResultUrl = (url) {
+    return url?.toLowerCase()
+  }
+
+  let websiteName = getResultUrl(result.url)
+
+  switch (websiteName) {
+    case 'wuxiaworld':
+      //Do shit when wuxia
+    case 'blogspot':
+      //Do shit when blogspot
+    default:
+      const tags = ['nav', 'header', 'footer', '.hidden'];
+      tags.map(tag => loadedCheerio(tag).remove());
+      chapterText = loadedCheerio('body').html();
+  }
+
   let isWuxiaWorld = result.url.toLowerCase().includes('wuxiaworld');
 
   let isBlogspot = result.url.toLowerCase().includes('blogspot');
@@ -234,14 +251,10 @@ const parseChapter = async (novelUrl, chapterUrl) => {
    */
   let isWordPress =
     loadedCheerio('meta[name="generator"]').attr('content') ||
-    loadedCheerio('footer').text();
+    loadedCheerio('footer').text() ?? null;
 
-  if (isWordPress) {
-    isWordPress =
-      isWordPress.toLowerCase().includes('wordpress') ||
-      isWordPress.includes('Site Kit by Google') ||
-      loadedCheerio('.powered-by').text().toLowerCase().includes('wordpress');
-  }
+  if (isWordPress) isWordPress = isWordPress?.toLowerCase()?.includes('wordpress') ?? isWordPress?.includes('Site Kit by Google') ?? loadedCheerio('powered-by')?.text()?
+      toLowerCase()?.includes('wordpress') ?? null
 
   let isRainOfSnow = result.url.toLowerCase().includes('rainofsnow');
 
